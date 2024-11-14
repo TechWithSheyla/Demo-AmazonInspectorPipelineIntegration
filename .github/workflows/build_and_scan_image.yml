@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile-py
+          file: ./Dockerfile
           push: false
           tags: py:latest
           load: true
