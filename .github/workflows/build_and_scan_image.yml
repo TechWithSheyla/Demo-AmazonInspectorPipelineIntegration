@@ -7,6 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: plugin-development
+
+    # Configura los permisos para habilitar la autenticación con OIDC
+    permissions:
+      id-token: write
+      contents: read
+
  
     steps:
       - name: Checkout this repository
