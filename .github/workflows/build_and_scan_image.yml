@@ -13,7 +13,12 @@ jobs:
 
  
    steps:
+    # Clean up AWS credentials cache if any
+     - name: Clean up old AWS credentials
+       run: |
+         rm -rf ~/.aws
 
+     
      # modify this block based on how you authenticate to AWS
      # make sure you have permission to access the Inspector ScanSbom API
      # https://docs.aws.amazon.com/inspector/latest/user/configure-cicd-account.html#cicd-iam-role
@@ -22,6 +27,8 @@ jobs:
        with:
          aws-region: "us-east-1"
          role-to-assume: "arn:aws:iam::066849108148:role/InspectorCICDscan-role"
+         role-session-name: "GitHubActionsSession"
+         id-token: "true"  # Ensure OIDC token is provided for authentication
 
      # Check out your repository if needed
      - name: Checkout this repository
