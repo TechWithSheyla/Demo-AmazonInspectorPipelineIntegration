@@ -11,10 +11,7 @@ jobs:
      contents: read
 
 
-   # change this to match your GitHub Secrets environment
-   environment:
-     name: dev
-
+ 
    steps:
 
      # modify this block based on how you authenticate to AWS
