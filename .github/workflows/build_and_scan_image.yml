@@ -105,7 +105,7 @@ jobs:
 
      - name: Scan container
        id: inspector-detailed
-       uses: aws/vulnerability-scan-github-action-for-amazon-inspector@v1
+       uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
          artifact_type: 'container'
          artifact_path: 'ubuntu:14.04'
