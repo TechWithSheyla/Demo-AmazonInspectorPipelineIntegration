@@ -23,8 +23,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          load: false
+          push: false
+          load: true
      # Clean up AWS credentials cache if any
       - name: Clean up old AWS credentials
         run: |
