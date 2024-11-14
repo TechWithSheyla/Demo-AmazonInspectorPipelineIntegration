@@ -1,3 +1,0 @@
-              - name: Vulnerability Scan GitHub Action for Amazon Inspector
-                uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
-            
