@@ -13,8 +13,6 @@ jobs:
 
 
     steps:
-    
-      # checkout the repository containing our Dockerfile
       - name: Checkout this repository
         uses: actions/checkout@v4
 
