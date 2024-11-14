@@ -30,9 +30,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile-py
           push: false
-          tags: app:latest
+          tags: py:latest
           load: true
 
       # setup your AWS credentials
@@ -47,7 +47,7 @@ jobs:
         id: inspector
         with:
           artifact_type: 'container'
-          artifact_path: 'app:latest' # make sure this matches the image you built
+          artifact_path: 'py:latest' # make sure this matches the image you built
           critical_threshold: 1
           high_threshold: 1
           medium_threshold: 1
