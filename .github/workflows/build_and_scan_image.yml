@@ -27,8 +27,8 @@ jobs:
        with:
          aws-region: "us-east-1"
          role-to-assume: "arn:aws:iam::066849108148:role/InspectorCICDscan-role"
-         role-session-name: "GitHubActionsSession"
-         id-token: "true"  # Ensure OIDC token is provided for authentication
+    
+         
 
      # Check out your repository if needed
      - name: Checkout this repository
