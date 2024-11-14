@@ -34,19 +34,29 @@ jobs:
      - name: Checkout this repository
        uses: actions/checkout@v4
 
+     - name: Build Docker image
+       run: |
+         docker build -t docker-image ./dockerfiles/Dockerfile-python
+
+     - name: Save Docker image to TAR
+       run: |
+         docker save docker-image > docker-image.tar
+         
+
+
      # modify this block to scan your intended artifact
      - name: Inspector Scan
        id: inspector
        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
          # change artifact_type to either 'repository', 'container', 'binary', or 'archive'.
-         artifact_type: 'repository'
+         artifact_type: 'binary'
 
          # change artifact_path to the file path or container image you would like to scan.
          # File paths should be relative to your root project directory.
          # For containers, this action accepts 'docker pull'-style references to containers,
          # such as 'alpine:latest' or a file path to an image exported as TAR using docker save.
-         artifact_path: './dockerfiles/*'
+         artifact_path: 'docker-image.tar'
 
          # If enabled, this setting will display Inspector's vulnerability scan findings
          # as a GitHub actions step summary. See here for an example step summary:
