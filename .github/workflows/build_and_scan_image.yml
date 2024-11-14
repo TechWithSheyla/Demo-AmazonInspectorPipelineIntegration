@@ -46,7 +46,7 @@ jobs:
          # File paths should be relative to your root project directory.
          # For containers, this action accepts 'docker pull'-style references to containers,
          # such as 'alpine:latest' or a file path to an image exported as TAR using docker save.
-         artifact_path: './'
+         artifact_path: './**/Dockerfile'
 
          # If enabled, this setting will display Inspector's vulnerability scan findings
          # as a GitHub actions step summary. See here for an example step summary:
@@ -103,25 +103,4 @@ jobs:
      - name: On vulnerability threshold exceeded
        run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
 
-     - name: Scan container
-       id: inspector-detailed
-       uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
-       with:
-         artifact_type: 'container'
-         artifact_path: 'ubuntu:14.04'
-         display_vulnerability_findings: "enabled"
-     
-     # Display Inspector results in the GitHub Actions terminal
-     - name: Display CycloneDX SBOM (JSON)
-       run: cat ${{ steps.inspector.outputs.artifact_sbom }}
-     
-     - name: Display Inspector vulnerability scan results (JSON)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results }}
-     
-     - name: Display Inspector vulnerability scan results (CSV)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results_csv }}
-     
-     - name: Display Inspector vulnerability scan results (markdown)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
-     
-     
+ 
