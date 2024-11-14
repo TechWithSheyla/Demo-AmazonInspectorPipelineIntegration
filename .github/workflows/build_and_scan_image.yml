@@ -40,7 +40,7 @@ jobs:
        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
          # change artifact_type to either 'repository', 'container', 'binary', or 'archive'.
-         artifact_type: 'container'
+         artifact_type: 'repository'
 
          # change artifact_path to the file path or container image you would like to scan.
          # File paths should be relative to your root project directory.
@@ -103,4 +103,25 @@ jobs:
      - name: On vulnerability threshold exceeded
        run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
 
-   
+     - name: Scan container
+       id: inspector-detailed
+       uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+       with:
+         artifact_type: 'container'
+         artifact_path: 'ubuntu:14.04'
+         display_vulnerability_findings: "enabled"
+     
+     # Display Inspector results in the GitHub Actions terminal
+     - name: Display CycloneDX SBOM (JSON)
+       run: cat ${{ steps.inspector.outputs.artifact_sbom }}
+     
+     - name: Display Inspector vulnerability scan results (JSON)
+       run: cat ${{ steps.inspector.outputs.inspector_scan_results }}
+     
+     - name: Display Inspector vulnerability scan results (CSV)
+       run: cat ${{ steps.inspector.outputs.inspector_scan_results_csv }}
+     
+     - name: Display Inspector vulnerability scan results (markdown)
+       run: cat ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
+     
+     
