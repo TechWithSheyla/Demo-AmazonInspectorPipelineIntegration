@@ -13,9 +13,6 @@ jobs:
 
  
    steps:
-   
-   
-
     # Clean up AWS credentials cache if any
      - name: Clean up old AWS credentials
        run: |
@@ -38,7 +35,7 @@ jobs:
        uses: actions/checkout@v4
 
      # modify this block to scan your intended artifact
-     - name: Scan built image with Inspector
+     - name: Inspector Scan
        id: inspector
        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
