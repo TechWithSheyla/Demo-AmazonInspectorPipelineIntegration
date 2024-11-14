@@ -1,12 +1,13 @@
-name: Scan artifact with Amazon Inspector
+name: Build and Scan artifact with Amazon Inspector
 on: [push]
 jobs:
+
  daily_job:
    runs-on: ubuntu-latest
 
    # change this to match your GitHub Secrets environment
    environment:
-     name: your_github_secrets_environment
+     name: dev
 
    steps:
 
@@ -17,7 +18,7 @@ jobs:
        uses: aws-actions/configure-aws-credentials@v4
        with:
          aws-region: "us-east-1"
-         role-to-assume: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/<IAM_ROLE_NAME>"
+         role-to-assume: "arn:aws:iam::066849108148:role/InspectorCICDscan-role"
 
      # Check out your repository if needed
      - name: Checkout this repository
