@@ -40,7 +40,7 @@ jobs:
        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
          # change artifact_type to either 'repository', 'container', 'binary', or 'archive'.
-         artifact_type: 'container'
+         artifact_type: 'repository'
 
          # change artifact_path to the file path or container image you would like to scan.
          # File paths should be relative to your root project directory.
