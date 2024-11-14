@@ -6,13 +6,12 @@ jobs:
   build:
     name: Build docker image
     runs-on: ubuntu-latest
-    # Configura los permisos para habilitar la autenticación con OIDC
-    permissions:
-      id-token: write
-      contents: read
-
+    environment:
+      # change this to match your GitHub secrets environment
+      name: plugin-development
 
     steps:
+      # checkout the repository containing our Dockerfile
       - name: Checkout this repository
         uses: actions/checkout@v4
 
@@ -35,10 +34,10 @@ jobs:
 
       # setup your AWS credentials
       - name: Configure AWS credentials
-       uses: aws-actions/configure-aws-credentials@v4
-       with:
-         aws-region: "us-east-1"
-         role-to-assume: "arn:aws:iam::066849108148:role/InspectorRoleForGithub"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "us-east-1"
+          role-to-assume: "arn:aws:iam::066849108148:role/InspectorRoleForGithub"
 
       - name: Scan built image with Inspector
         uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
@@ -55,6 +54,7 @@ jobs:
 
       - name: Fail job if vulnerability threshold is exceeded
         run: exit ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
-
-        # add any additional steps for deploying your image
+        
+  
+      
 
