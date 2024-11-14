@@ -5,6 +5,12 @@ jobs:
  daily_job:
    runs-on: ubuntu-latest
 
+   # Configura los permisos para habilitar la autenticación con OIDC
+   permissions:
+     id-token: write
+     contents: read
+
+
    # change this to match your GitHub Secrets environment
    environment:
      name: dev
