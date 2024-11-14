@@ -46,7 +46,7 @@ jobs:
          # File paths should be relative to your root project directory.
          # For containers, this action accepts 'docker pull'-style references to containers,
          # such as 'alpine:latest' or a file path to an image exported as TAR using docker save.
-         artifact_path: './dockerfiles'
+         artifact_path: './dockerfiles/Dockerfile*'
 
          # If enabled, this setting will display Inspector's vulnerability scan findings
          # as a GitHub actions step summary. See here for an example step summary:
