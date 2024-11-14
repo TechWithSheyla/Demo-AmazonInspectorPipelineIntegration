@@ -1,34 +1,7 @@
 name: Build and Scan artifact with Amazon Inspector
 on: [push]
 jobs:
- build:
-    name: Build docker image
-    runs-on: ubuntu-latest
-    environment:
-      # change this to match your GitHub secrets environment
-      name: plugin-development
-
-    steps:
-      # checkout the repository containing our Dockerfile
-      - name: Checkout this repository
-        uses: actions/checkout@v4
-
-      # Setup prerequisites for docker/build-push-action
-      - name: Set up docker build prereqs (QEMU)
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up docker build prereqs (Buildx)
-        uses: docker/setup-buildx-action@v3
-
-      # build the image you wish to scan
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: app:latest
-          load: true
+ 
  daily_job:
    runs-on: ubuntu-latest
 
@@ -67,7 +40,7 @@ jobs:
        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
        with:
          # change artifact_type to either 'repository', 'container', 'binary', or 'archive'.
-         artifact_type: 'repository'
+         artifact_type: 'container'
 
          # change artifact_path to the file path or container image you would like to scan.
          # File paths should be relative to your root project directory.
