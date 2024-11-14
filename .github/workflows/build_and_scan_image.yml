@@ -13,8 +13,12 @@ jobs:
       id-token: write
       contents: read
 
- 
+ # Clean up AWS credentials cache if any
+  
     steps:
+      - name: Clean up old AWS credentials
+        run: |
+         rm -rf ~/.aws
       - name: Checkout this repository
         uses: actions/checkout@v4
 
@@ -31,10 +35,7 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
-     # Clean up AWS credentials cache if any
-      - name: Clean up old AWS credentials
-        run: |
-         rm -rf ~/.aws
+     
 
      
      # modify this block based on how you authenticate to AWS
