@@ -108,16 +108,7 @@ jobs:
            ${{ steps.inspector.outputs.inspector_scan_results_csv }}
            ${{ steps.inspector.outputs.artifact_sbom }}
            ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
-
-
-       # This step illustrates how to add custom logic if
-       # the vulnerability threshold is exceeded. This example
-       # simply prints the 'vulnerability_threshold_exceeded' value
-       # to the GitHub actions job terminal.
-       # Replace 'echo' with 'exit' if you want to fail the job.
      - name: On vulnerability threshold exceeded
        run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
+     
 
- 
-        # substitute 'exit' for 'echo' if you want to fail the job
-        run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
