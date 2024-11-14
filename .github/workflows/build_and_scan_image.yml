@@ -1,108 +1,100 @@
 name: Build and Scan artifact with Amazon Inspector
 on: [push]
 jobs:
- 
- daily_job:
-   runs-on: ubuntu-latest
-
-   # Configura los permisos para habilitar la autenticación con OIDC
-   permissions:
-     id-token: write
-     contents: read
-
+# Configura los permisos para habilitar la autenticación con OIDC
+  permissions:
+    id-token: write
+    contents: read
 
  
-   steps:
-    # Clean up AWS credentials cache if any
-     - name: Clean up old AWS credentials
-       run: |
+  build:
+    name: Build docker image
+    runs-on: ubuntu-latest
+    environment:
+      name: plugin-development
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Set up docker build prereqs (QEMU)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up docker build prereqs (Buildx)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          load: false
+     # Clean up AWS credentials cache if any
+      - name: Clean up old AWS credentials
+        run: |
          rm -rf ~/.aws
 
      
      # modify this block based on how you authenticate to AWS
      # make sure you have permission to access the Inspector ScanSbom API
      # https://docs.aws.amazon.com/inspector/latest/user/configure-cicd-account.html#cicd-iam-role
-     - name: Configure AWS credentials
-       uses: aws-actions/configure-aws-credentials@v4
-       with:
-         aws-region: "us-east-1"
-         role-to-assume: "arn:aws:iam::066849108148:role/InspectorRoleForGithub"
-    
-         
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "us-east-1"
+          role-to-assume: "arn:aws:iam::066849108148:role/InspectorRoleForGithub"
 
-     # Check out your repository if needed
-     - name: Checkout this repository
-       uses: actions/checkout@v4
+      - name: Scan built image with Inspector
+        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+        id: inspector
+        with:
+          artifact_type: 'container'
+          artifact_path: 'app:latest'
+          display_vulnerability_findings: "enabled"
+          output_sbom_path: 'sbom.json'
+          output_inspector_scan_path: 'inspector_scan.json'
+          output_inspector_scan_path_csv: 'inspector_pkg_scan.csv'
+          output_inspector_dockerfile_scan_path_csv: 'inspector_dockerfile_scan.csv'
+          output_inspector_dockerfile_scan_path_markdown: 'inspector_dockerfile_scan.md'
+          critical_threshold: 1
+          high_threshold: 1
+          medium_threshold: 1
+          low_threshold: 1
+          other_threshold: 1
+          sbomgen_version: "latest"
 
-     
+      - name: Demonstrate SBOM Output (JSON)
+        run: cat ${{ steps.inspector.outputs.artifact_sbom }}
 
-     # modify this block to scan your intended artifact
-     - name: Inspector Scan
-       id: inspector
-       uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
-       with:
-         # change artifact_type to either 'repository', 'container', 'binary', or 'archive'.
-         artifact_type: 'repository'
+      - name: Demonstrate Inspector Scan Output (JSON)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results }}
 
-         # change artifact_path to the file path or container image you would like to scan.
-         # File paths should be relative to your root project directory.
-         # For containers, this action accepts 'docker pull'-style references to containers,
-         # such as 'alpine:latest' or a file path to an image exported as TAR using docker save.
-         artifact_path: './'
+      - name: Demonstrate Inspector Scan Output (CSV)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results_csv }}
 
-         # If enabled, this setting will display Inspector's vulnerability scan findings
-         # as a GitHub actions step summary. See here for an example step summary:
-         # https://github.com/aws-actions/vulnerability-scan-github-action-for-amazon-inspector/actions/runs/8800085041
-         display_vulnerability_findings: "enabled"
+      - name: Display Dockerfile vulns (CSV)
+        run: cat inspector_dockerfile_scan.csv
 
-         # Set vulnerability thresholds; if the number of vulnerabilities is
-         # equal to or greater than any of the specified thresholds, this
-         # action will set the 'vulnerability_threshold_exceeded'
-         # output flag to 1.
-         critical_threshold: 1
-         high_threshold: 1
-         medium_threshold: 1
-         low_threshold: 1
-         other_threshold: 1
+      - name: Display Dockerfile vulns (MD)
+        run: cat inspector_dockerfile_scan.md
 
-         # Additional input arguments are available to control scan behavior.
-         # See 'action.yml' for additional input/output options.
+      - name: Debug Dockerfile output variables
+        run: |
+          echo ${{ steps.inspector.outputs.inspector_dockerile_scan_results_csv }}
+          echo ${{ steps.inspector.outputs.inspector_dockerile_scan_results_markdown }}
+      - name: Demonstrate Upload Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Inspector Scan SBOM Results
+          path: |
+            ${{ steps.inspector.outputs.artifact_sbom }}
+            ${{ steps.inspector.outputs.inspector_scan_results }}
+            ${{ steps.inspector.outputs.inspector_scan_results_csv }}
+            ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
+            ${{ steps.inspector.outputs.inspector_dockerile_scan_results_csv }}
+            ${{ steps.inspector.outputs.inspector_dockerile_scan_results_markdown }}
+      - name: On vulnerability threshold exceeded
 
-
-     # The following steps illustrate how to
-     # display scan results in the GitHub Actions job terminal.
-     - name: Display CycloneDX SBOM (JSON)
-       run: cat ${{ steps.inspector.outputs.artifact_sbom }}
-
-     - name: Display Inspector vulnerability scan results (JSON)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results }}
-
-     - name: Display Inspector vulnerability scan results (CSV)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results_csv }}
-
-     - name: Display Inspector vulnerability scan results (Markdown)
-       run: cat ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
-
-
-     # The following steps illustrate how to
-     # upload scan results as a GitHub actions job artifact
-     - name: Upload Scan Results
-       uses: actions/upload-artifact@v4
-       with:
-         name: Inspector Vulnerability Scan Artifacts
-         path: |
-           ${{ steps.inspector.outputs.inspector_scan_results }}
-           ${{ steps.inspector.outputs.inspector_scan_results_csv }}
-           ${{ steps.inspector.outputs.artifact_sbom }}
-           ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
-
-
-       # This step illustrates how to add custom logic if
-       # the vulnerability threshold is exceeded. This example
-       # simply prints the 'vulnerability_threshold_exceeded' value
-       # to the GitHub actions job terminal.
-       # Replace 'echo' with 'exit' if you want to fail the job.
-     - name: On vulnerability threshold exceeded
-       run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
-
- 
+        # substitute 'exit' for 'echo' if you want to fail the job
+        run: echo ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
