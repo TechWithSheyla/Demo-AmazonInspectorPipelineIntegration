@@ -13,3 +13,4 @@ ENV APACHE_LOG_DIR /var/log/apache2
 ENV APACHE_LOG_RUN /var/log/apache2
 EXPOSE 80
 CMD / root/run_apache.sh
+
